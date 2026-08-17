@@ -212,6 +212,11 @@
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    // Where the weakest and the strongest value sit along the track. Leaving a
+    // margin at both ends is what opens up the middle, so scores that differ by
+    // a point or two stop landing on top of each other.
+    var LO = 14, HI = 93;
+
     function chart(key, rows) {
       var md = QUANT.metrics[key];
       var scored = rows.filter(function (r) { return r[key] !== null && r[key] !== undefined; });
@@ -219,29 +224,34 @@
       var vals = scored.map(function (r) { return r[key]; });
       var best = md.higher ? Math.max.apply(null, vals) : Math.min.apply(null, vals);
       var worst = md.higher ? Math.min.apply(null, vals) : Math.max.apply(null, vals);
+      var span = best - worst;
 
       var body = rows.map(function (r) {
         var v = r[key];
-        var cls = 'qbar' + (r.ours ? ' is-ours' : '') + (v === best ? ' is-best' : '');
         if (v === null || v === undefined) {
-          return '<div class="qbar is-empty"><span class="qbar-name">' + esc(r.name) + '</span>' +
-            '<span class="qbar-track"></span><span class="qbar-val">n/a</span></div>';
+          return '<div class="qdot is-empty"><span class="qdot-name">' + esc(r.name) + '</span>' +
+            '<span class="qdot-track"></span><span class="qdot-val">n/a</span></div>';
         }
-        // The bar always reads as the value itself, never as the rank. Higher is
-        // better metrics are percentages already. Lower is better metrics are
-        // scaled against the largest value in the chart, so the winner is the
-        // shortest bar rather than the longest one.
-        var w = md.higher ? Math.max(0, Math.min(100, v)) : (v / worst) * 100;
+        var cls = 'qdot' + (r.ours ? ' is-ours' : '') + (v === best ? ' is-best' : '');
+        // A dot encodes position rather than length, so the scale does not have
+        // to reach zero to stay honest. The axis is zoomed to the values being
+        // compared, and better always lies to the right, whichever direction the
+        // metric improves in. The two ends of the range are printed underneath.
+        var pos = span === 0 ? (LO + HI) / 2 : LO + ((v - worst) / span) * (HI - LO);
         return '<div class="' + cls + '">' +
-          '<span class="qbar-name">' + esc(r.name) + '</span>' +
-          '<span class="qbar-track"><span class="qbar-fill" data-w="' + w.toFixed(1) + '"></span></span>' +
-          '<span class="qbar-val">' + v.toFixed(md.digits) + '</span></div>';
+          '<span class="qdot-name">' + esc(r.name) + '</span>' +
+          '<span class="qdot-track"><span class="qdot-mark" data-pos="' + pos.toFixed(1) + '"></span></span>' +
+          '<span class="qdot-val">' + v.toFixed(md.digits) + '</span></div>';
       }).join('');
 
       return '<div class="quant-card" data-metric="' + key + '">' +
         '<div class="quant-card-head"><span class="quant-card-title">' + esc(md.label) + '</span>' +
         '<span class="quant-card-dir">' + (md.higher ? 'higher is better' : 'lower is better') + '</span></div>' +
-        body + '</div>';
+        body +
+        '<div class="quant-axis"><span>' + worst.toFixed(md.digits) + '</span>' +
+        '<span class="quant-axis-arrow">better</span>' +
+        '<span>' + best.toFixed(md.digits) + '</span></div>' +
+        '</div>';
     }
 
     function render() {
@@ -253,8 +263,8 @@
       });
       panel.innerHTML = html;
       requestAnimationFrame(function () {
-        panel.querySelectorAll('.qbar-fill').forEach(function (f) {
-          f.style.width = f.getAttribute('data-w') + '%';
+        panel.querySelectorAll('.qdot-mark').forEach(function (d) {
+          d.style.left = d.getAttribute('data-pos') + '%';
         });
       });
       root.querySelectorAll('.quant-dataset').forEach(function (t) {
