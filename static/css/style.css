@@ -309,13 +309,6 @@ html[data-theme="light"] .hero-vignette {
   color: var(--text-color);
 }
 .statement .accent { color: var(--accent); }
-/* The lead statement carries the full figure caption here, which is a paragraph
-   rather than a slogan, so it steps down a size to stay readable at that length. */
-.statement-long {
-  font-size: clamp(1.15rem, 2.2vw, 1.65rem);
-  line-height: 1.45;
-  max-width: 62ch;
-}
 .prose { color: var(--subdued-text); text-align: justify; hyphens: auto; max-width: 900px; }
 .prose p { margin: 0 0 1.1rem 0; }
 
