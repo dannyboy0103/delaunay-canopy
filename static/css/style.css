@@ -313,27 +313,27 @@ html[data-theme="light"] .hero-vignette {
 .prose p { margin: 0 0 1.1rem 0; }
 
 /* ===================== TL;DR cards ===================== */
-.tldr-grid {
+.card-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
   margin-top: 2.5rem;
 }
-.tldr-card {
+.info-card {
   padding: 1.6rem;
   border-radius: 16px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.05), transparent 70%), var(--card-bg);
   transition: transform 0.25s var(--ease-out), border-color 0.25s;
 }
-.tldr-card:hover { transform: translateY(-3px); border-color: var(--hairline); }
-.tldr-card .card-icon {
+.info-card:hover { transform: translateY(-3px); border-color: var(--hairline); }
+.info-card .card-icon {
   font-size: 1.4rem;
   color: var(--accent);
   margin-bottom: 0.8rem;
 }
-.tldr-card h3 { font-weight: 500; font-size: 1.1rem; margin: 0 0 0.5rem 0; }
-.tldr-card p { color: var(--subdued-text); font-size: 0.95rem; margin: 0; }
+.info-card h3 { font-weight: 500; font-size: 1.1rem; margin: 0 0 0.5rem 0; }
+.info-card p { color: var(--subdued-text); font-size: 0.95rem; margin: 0; }
 
 /* ===================== Figures ===================== */
 .figure { margin: 1.5rem 0; }
@@ -389,9 +389,6 @@ html[data-theme="light"] .hero-vignette {
   gap: 2.5rem;
   align-items: center;
 }
-/* three column, for a stage-by-stage walk through one figure */
-.cols-3 { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
-.cols-3 .prose { text-align: left; max-width: none; }
 
 /* ===================== Placeholder for missing figures ===================== */
 .asset-placeholder {
@@ -939,6 +936,6 @@ html[data-theme="light"] .samp-cell {
 @media (max-width: 820px) {
   :root { --section-pad: 4rem; }
   .cols { grid-template-columns: 1fr; gap: 1.5rem; }
-  .tldr-grid { grid-template-columns: 1fr; }
+  .card-grid { grid-template-columns: 1fr; }
   .hero-subtitle { white-space: normal; }
 }

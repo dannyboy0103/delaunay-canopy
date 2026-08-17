@@ -110,20 +110,20 @@
     <img data-fig src="./static/images/teaser.png" alt="Delaunay Canopy teaser">
   </div>
 
-  <div class="tldr-grid reveal-stagger">
-    <div class="tldr-card">
+  <div class="card-grid reveal-stagger">
+    <div class="info-card">
       <div class="card-icon"><i class="fas fa-diagram-project"></i></div>
       <h3>Delaunay Graph Scoring</h3>
       <p>Delaunay triangulation quantifies local curvature, transforming the underlying surface geometry
         into essential curvature signatures.</p>
     </div>
-    <div class="tldr-card">
+    <div class="info-card">
       <div class="card-icon"><i class="fas fa-crosshairs"></i></div>
       <h3>Adaptive Search Space</h3>
       <p>Corner and wire selection leverages the geometric cue to adaptively adjust the search space,
         focusing the model on probable candidates.</p>
     </div>
-    <div class="tldr-card">
+    <div class="info-card">
       <div class="card-icon"><i class="fas fa-ranking-star"></i></div>
       <h3>State of the Art</h3>
       <p>State-of-the-art results on the Building3D Tallinn city and entry-level datasets, supported by
@@ -169,28 +169,26 @@
     <img data-fig src="./static/images/scoring.png" alt="Delaunay graph scoring, from the graph to edge-wise dihedral angles to vertex-wise corner scores">
   </div>
 
-  <div class="cols cols-3 reveal" style="margin-top:2rem;align-items:start;">
-    <div class="prose">
-      <p>
-        <strong>Face Normal Computation.</strong> For every face within the Delaunay graph, the normal
-        vector is computed from its three constituent vertices.
-      </p>
+  <div class="card-grid reveal-stagger" style="margin-top:2rem;">
+    <div class="info-card">
+      <div class="card-icon"><i class="fas fa-draw-polygon"></i></div>
+      <h3>Face Normal Computation</h3>
+      <p>For every face within the Delaunay graph, the normal vector is computed from its three
+        constituent vertices.</p>
     </div>
-    <div class="prose">
-      <p>
-        <strong>Edge-Wise Dihedral Angle.</strong> For every edge, the dihedral angle is the angle between
-        the normal vectors of its two adjacent faces, falling in \([0, \pi]\). A large dihedral angle
-        signifies a sharp fold or corner where the two adjacent faces meet, whereas a small angle
-        indicates that the region is relatively flat.
-      </p>
+    <div class="info-card">
+      <div class="card-icon"><i class="fas fa-compass-drafting"></i></div>
+      <h3>Edge-Wise Dihedral Angle</h3>
+      <p>For every edge, the dihedral angle is the angle between the normal vectors of its two adjacent
+        faces. A large dihedral angle signifies a sharp fold or corner where the two adjacent faces
+        meet.</p>
     </div>
-    <div class="prose">
-      <p>
-        <strong>Vertex-Wise Corner Score.</strong> For every vertex, the corner score is determined by
-        aggregating the dihedral angles of all its incident edges into their mean. A high corner score
-        implies the presence of numerous edges with high dihedral angles, suggesting that the vertex is
-        highly likely to be an actual corner of the building.
-      </p>
+    <div class="info-card">
+      <div class="card-icon"><i class="fas fa-circle-nodes"></i></div>
+      <h3>Vertex-Wise Corner Score</h3>
+      <p>For every vertex, the corner score is determined by aggregating the dihedral angles of all its
+        incident edges into their mean. A high corner score suggests that the vertex is highly likely to
+        be an actual corner of the building.</p>
     </div>
   </div>
 </section>
