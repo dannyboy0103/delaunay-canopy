@@ -145,9 +145,9 @@
   </div>
 
   <ol class="bullets reveal">
-    <li><span class="n">01</span> Delaunay graph scoring applies Delaunay triangulation to the airborne LiDAR point cloud to approximate its underlying surface and computes region-wise curvature metrics that score the elements of the Delaunay graph.</li>
-    <li><span class="n">02</span> Leveraging the vertex-wise geometric prior, we sample and classify points with high corner scores as candidates and train a corner selection module to predict the final corners.</li>
-    <li><span class="n">03</span> Leveraging the edge-wise geometric prior, we assign each wire candidate a path score along the shortest Delaunay graph path and train a wire selection module to select valid wires.</li>
+    <li><span class="n">01</span> <strong>Delaunay Graph Scoring.</strong> Delaunay triangulation approximates the underlying surface of the point cloud, then region-wise curvature metrics are computed for each element in the order of face, edge, and vertex.</li>
+    <li><span class="n">02</span> <strong>Corner Selection.</strong> Leveraging the vertex-wise prior, corner score sampling isolates a small, geometry-aware subset of points likely to represent true corners, and the corner selection module refines them into the final corners.</li>
+    <li><span class="n">03</span> <strong>Wire Selection.</strong> Leveraging the edge-wise prior, each wire candidate takes a path score averaged along its shortest Delaunay path, and the wire selection module uses that score to determine valid wires.</li>
   </ol>
 </section>
 
