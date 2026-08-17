@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Delaunay Canopy</title>
+  <meta name="description"
+        content="Delaunay Canopy: Building Wireframe Reconstruction from Airborne LiDAR Point Clouds via Delaunay Graph. ECCV 2026.">
+  <meta name="keywords" content="Wireframe Reconstruction, Airborne LiDAR, Point Cloud, Delaunay Graph, Building3D, ECCV 2026">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./static/css/style.css">
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], tags: 'ams' },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Three.js module map -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script defer src="./static/js/site.js"></script>
+  <script type="module" src="./static/js/viewer.js"></script>
+</head>
+<body class="site-modern">
+
+<button class="theme-toggle" aria-label="Toggle theme"></button>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero" id="top">
+  <canvas id="hero-canvas"
+          data-hero-pc="./static/models/b33630_pc.ply"
+          data-hero-wf="./static/models/b33630_wf.obj"
+          data-hero-up="z"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner">
+    <h1 class="hero-title">Delaunay Canopy</h1>
+    <p class="hero-subtitle">
+      Building Wireframe Reconstruction from Airborne LiDAR Point Clouds via Delaunay Graph
+    </p>
+  </div>
+</header>
+
+<!-- ===================== META ===================== -->
+<section class="section" id="meta" style="text-align:center;">
+  <div class="authors">
+    <span class="author">Donghyun Kim<sup>1,2</sup></span>
+    <span class="author">Chanyoung Kim<sup>1,2</sup></span>
+    <span class="author">Youngjoong Kwon<sup>2&#42;</sup></span>
+    <span class="author">Seong Jae Hwang<sup>1&#42;</sup></span>
+  </div>
+  <div class="affils">
+    <sup>1</sup>Yonsei University &nbsp;&nbsp;
+    <sup>2</sup>Emory University
+  </div>
+  <div class="corresponding"><sup>&#42;</sup>Corresponding authors</div>
+
+  <span class="venue-badge" style="margin-top:1.6rem;">ECCV 2026</span>
+
+  <div class="actions">
+    <a class="action-btn" data-magnetic href="./static/pdfs/Delaunay_Canopy.pdf">
+      <span class="icon"><i class="fas fa-file-pdf"></i></span> Paper
+    </a>
+    <a class="action-btn" data-magnetic href="./static/pdfs/Delaunay_Canopy_supp.pdf">
+      <span class="icon"><i class="fas fa-file-pdf"></i></span> Supplementary
+    </a>
+    <a class="action-btn" data-magnetic href="https://arxiv.org/abs/2604.02497">
+      <span class="icon"><i class="ai ai-arxiv"></i></span> arXiv
+    </a>
+    <!-- TODO replace href with the GitHub repository URL -->
+    <a class="action-btn" data-magnetic href="#">
+      <span class="icon"><i class="fab fa-github"></i></span> Code
+    </a>
+  </div>
+</section>
+
+<!-- ===================== TL;DR ===================== -->
+<section class="section" id="tldr">
+  <div class="section-header reveal">
+    <div class="index-title">TL;DR</div>
+    <div class="rule"></div>
+  </div>
+
+  <p class="statement reveal">
+    <span class="accent">Delaunay Canopy</span> scores a <em>Delaunay graph</em> with geometric priors to
+    reconstruct building wireframes precisely, even in sparse, noisy, and internal-corner regions.
+  </p>
+
+  <div class="figure card reveal" style="margin-top:2rem;">
+    <img data-fig src="./static/images/teaser.png" alt="Delaunay Canopy teaser">
+  </div>
+  <div class="reveal">
+    <div class="caption" style="margin-top:0.9rem;">
+      Compared to traditional methods with overly large search space (left) and 2D height map
+      projection that loses 3D context (right), our approach scores a Delaunay graph with geometric
+      priors to select corners and wires, yielding an adaptive (i.e., geometrically context-aware)
+      search space that enables precise wireframe reconstruction.
+    </div>
+  </div>
+
+  <div class="tldr-grid reveal-stagger">
+    <div class="tldr-card">
+      <div class="card-icon"><i class="fas fa-diagram-project"></i></div>
+      <h3>Delaunay Graph Scoring</h3>
+      <p>Dihedral angles over a Delaunay graph turn raw geometry into region-wise curvature signatures.</p>
+    </div>
+    <div class="tldr-card">
+      <div class="card-icon"><i class="fas fa-crosshairs"></i></div>
+      <h3>Adaptive Search Space</h3>
+      <p>Corner score sampling and prior-based query scaling focus prediction on probable corners and wires.</p>
+    </div>
+    <div class="tldr-card">
+      <div class="card-icon"><i class="fas fa-ranking-star"></i></div>
+      <h3>State of the Art</h3>
+      <p>Best corner and wire accuracy on the Building3D Tallinn city and entry-level datasets.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 01 OVERVIEW ===================== -->
+<section class="section" id="overview">
+  <div class="section-header reveal">
+    <h2 class="header-inline"><span class="accent">Overview - From point cloud to wireframe</span></h2>
+    <div class="rule"></div>
+  </div>
+
+  <div class="figure card reveal">
+    <img data-fig src="./static/images/pipeline.png" alt="Overall pipeline of Delaunay Canopy">
+  </div>
+
+  <ol class="bullets reveal">
+    <li><span class="n">01</span> Delaunay graph scoring applies Delaunay triangulation to the airborne LiDAR point cloud to approximate its underlying surface and computes region-wise curvature metrics that score the elements of the Delaunay graph.</li>
+    <li><span class="n">02</span> Leveraging the vertex-wise geometric prior, we sample and classify points with high corner scores as candidates and train a corner selection module to predict the final corners.</li>
+    <li><span class="n">03</span> Leveraging the edge-wise geometric prior, we assign each wire candidate a path score along the shortest Delaunay graph path and train a wire selection module to select valid wires.</li>
+  </ol>
+</section>
+
+<!-- ===================== 02 DELAUNAY GRAPH SCORING ===================== -->
+<section class="section" id="scoring">
+  <div class="section-header reveal">
+    <h2 class="header-inline"><span class="accent">Delaunay Graph Scoring</span></h2>
+    <div class="rule"></div>
+  </div>
+
+  <p class="prose reveal">
+    We apply Delaunay triangulation to the airborne LiDAR point cloud to approximate its underlying
+    surface, producing a graph \(G=(V,E,F)\). Scoring that graph turns raw geometry into curvature
+    signatures, first on its edges and then on its vertices.
+  </p>
+
+  <div class="figure card reveal" style="margin-top:1.6rem;">
+    <img data-fig src="./static/images/scoring.png" alt="Delaunay graph scoring, from the graph to edge-wise dihedral angles to vertex-wise corner scores">
+  </div>
+
+  <div class="cols" style="margin-top:2rem;align-items:start;">
+    <div class="prose reveal">
+      <p>
+        <strong>Edge-wise dihedral angle.</strong> For an edge \(e\) with adjacent faces of normals
+        \(\mathbf{n}_1\) and \(\mathbf{n}_2\), the dihedral angle measures how sharply the surface bends
+        across that edge.
+      </p>
+      <div class="eq">
+        $$\theta_e = \arccos\!\left(\frac{\mathbf{n}_1 \cdot \mathbf{n}_2}{\lVert\mathbf{n}_1\rVert\,\lVert\mathbf{n}_2\rVert}\right) \in [0,\pi].$$
+      </div>
+    </div>
+    <div class="prose reveal">
+      <p>
+        <strong>Vertex-wise corner score.</strong> At the most granular level of the graph, aggregating
+        the dihedral angles of all incident edges \(E(v)\) yields a corner score, where a high value
+        flags significant local curvature.
+      </p>
+      <div class="eq">
+        $$S_c(v) = \frac{1}{|E(v)|}\sum_{e \in E(v)} \theta_e.$$
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 03 CORNER SCORE SAMPLING ===================== -->
+<section class="section" id="sampling">
+  <div class="section-header reveal">
+    <h2 class="header-inline"><span class="accent">Corner Score Sampling</span></h2>
+    <div class="rule"></div>
+  </div>
+  <p class="prose reveal" style="margin-bottom:1.5rem;">
+    Each panel runs from the raw input point cloud down to 500 points and then to 150 points, with the
+    ground truth wireframe kept faintly visible throughout. While farthest point sampling spreads its
+    budget evenly over the surface, corner score sampling retains points located in areas of pronounced
+    curvature (roof corners and edges), making them highly probable corner candidates.
+  </p>
+
+  <div class="samp-viewer reveal"
+       data-dir="./static/images/"
+       data-hold="2.0" data-fade="0.9"
+       data-buildings='["6341"]'
+       data-steps='[
+         {"file":"pcd","label":"Input point cloud"},
+         {"file":"{m}500","label":"500 sampling points"},
+         {"file":"{m}150","label":"150 sampling points"}
+       ]'
+       data-methods='[
+         {"key":"cs","label":"Corner Score Sampling","accent":true},
+         {"key":"fps","label":"Farthest Point Sampling"}
+       ]'></div>
+</section>
+
+<!-- ===================== 04 WIRE-WISE PATH SCORE ===================== -->
+<section class="section" id="wire">
+  <div class="section-header reveal">
+    <h2 class="header-inline"><span class="accent">Wire-Wise Path Score</span></h2>
+    <div class="rule"></div>
+  </div>
+
+  <div class="cols" style="align-items:start;">
+    <div class="reveal">
+      <div class="figure card">
+        <img data-fig src="./static/images/path_score.png" alt="A wire candidate and the shortest Delaunay path between its two endpoints">
+      </div>
+    </div>
+    <div class="prose reveal">
+      <p>
+        For a wire candidate \(w_{ij}\) connecting vertices \(v_i\) and \(v_j\), we first find the
+        shortest path \(P^{G}_{i \to j}\) between these two vertices on the Delaunay graph. The edges
+        along that path share the same local region as the wire candidate, so averaging their dihedral
+        angles gives a path score that represents the wire curvature.
+      </p>
+      <div class="eq">
+        $$S_P(v_i, v_j) = \frac{1}{|L(P^{G}_{i \to j})|}\sum_{e \in L(P^{G}_{i \to j})} \theta_e.$$
+      </div>
+      <p>
+        Through prior-based query scaling, each wire query is modulated by \(s^{w}=\sigma(S^{w}_{P})\),
+        damping low-score wires and emphasizing high-confidence ones. The model's attention is focused
+        on geometrically plausible structures, leading to stable and accurate wire predictions.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 05 QUALITATIVE RESULTS ===================== -->
+<section class="section" id="results">
+  <div class="section-header reveal">
+    <h2 class="header-inline"><span class="accent">Qualitative Results</span></h2>
+    <div class="rule"></div>
+  </div>
+  <p class="prose reveal" style="margin-bottom:1.5rem;">
+    Drag the divider to wipe between the input point cloud and the reconstructed wireframe. Drag
+    anywhere else to orbit, scroll to zoom. Each building turns on its own. Auto-rotation pauses the
+    moment you grab a view.
+  </p>
+
+  <div class="multi-viewer reveal"
+       data-sync="sample" data-up="z" data-cols="3" data-cols-narrow="1" data-cell-aspect="0.95"
+       data-cells='[
+         [
+           {"label":"Input Point Cloud","key":"pc","kind":"points"},
+           {"label":"Output Wireframe","key":"wf","kind":"wireframe","color":"auto"}
+         ]
+       ]'
+       data-items='[
+         {"pc":"./static/models/b7926_pc.ply","wf":"./static/models/b7926_wf.obj"},
+         {"pc":"./static/models/b4941_pc.ply","wf":"./static/models/b4941_wf.obj"},
+         {"pc":"./static/models/b12262_pc.ply","wf":"./static/models/b12262_wf.obj"}
+       ]'></div>
+</section>
+
+<!-- ===================== 06 RECOVERING INTERIOR CORNERS ===================== -->
+<section class="section" id="interior">
+  <div class="section-header reveal">
+    <h2 class="header-inline"><span class="accent">Recovering Interior Corners</span></h2>
+    <div class="rule"></div>
+  </div>
+  <p class="prose reveal" style="margin-bottom:1.5rem;">
+    Against the strongest baseline BWFormer, on challenging cases with complicated roof structures.
+    Fully leveraging 3D geometric context, a capability often absent when only 2D information is
+    employed, facilitates superior detection of interior corners in addition to those on the periphery.
+    Each row is one building, with the input on the left and the two reconstructions sharing the right
+    cell. Drag the divider there to swap between them.
+  </p>
+
+  <div class="multi-viewer reveal"
+       data-sync="sample" data-up="z" data-cols="2" data-cols-narrow="1" data-cell-aspect="1.45"
+       data-cells='[
+         [
+           {"label":"Input Point Cloud","key":"pc","kind":"points"}
+         ],
+         [
+           {"label":"BWFormer","key":"bw","kind":"wireframe"},
+           {"label":"Ours","key":"wf","kind":"wireframe","accent":true}
+         ]
+       ]'
+       data-items='[
+         {"pc":"./static/models/b7114_pc.ply","bw":"./static/models/b7114_bw.obj","wf":"./static/models/b7114_wf.obj"},
+         {"pc":"./static/models/b29842_pc.ply","bw":"./static/models/b29842_bw.obj","wf":"./static/models/b29842_wf.obj"},
+         {"pc":"./static/models/b31132_pc.ply","bw":"./static/models/b31132_bw.obj","wf":"./static/models/b31132_wf.obj"}
+       ]'></div>
+</section>
+
+<!-- ===================== 07 COMPLEX BUILDINGS ===================== -->
+<section class="section" id="complex">
+  <div class="section-header reveal">
+    <h2 class="header-inline"><span class="accent">Complex Buildings</span></h2>
+    <div class="rule"></div>
+  </div>
+  <p class="prose reveal" style="margin-bottom:1.5rem;">
+    Our framework exhibits strong robustness across challenging real-world scenarios, successfully
+    handling cluttered, occluded, and highly complex geometrical cases. Drag a divider to wipe
+    between the input and the reconstruction, drag anywhere else to orbit.
+  </p>
+
+  <div class="multi-viewer reveal"
+       data-sync="sample" data-up="z" data-cols="2" data-cols-narrow="1" data-cell-aspect="1.25"
+       data-cells='[
+         [
+           {"label":"Input Point Cloud","key":"pc","kind":"points"},
+           {"label":"Output Wireframe","key":"wf","kind":"wireframe","color":"auto"}
+         ]
+       ]'
+       data-items='[
+         {"pc":"./static/models/b42506_pc.ply","wf":"./static/models/b42506_wf.obj"},
+         {"pc":"./static/models/b33630_pc.ply","wf":"./static/models/b33630_wf.obj"}
+       ]'></div>
+</section>
+
+
+<!-- ===================== 08 QUANTITATIVE ===================== -->
+<section class="section" id="quant">
+  <div class="section-header reveal">
+    <h2 class="header-inline"><span class="accent">Quantitative Results</span></h2>
+    <div class="rule"></div>
+  </div>
+
+  <div class="quant-datasets reveal">
+    <button class="quant-dataset is-active" data-dataset="Tallinn City">Tallinn City</button>
+    <button class="quant-dataset" data-dataset="Entry-Level">Entry-Level</button>
+    <button class="quant-dataset" data-dataset="Official Leaderboard">Official Leaderboard</button>
+    <button class="quant-dataset" data-dataset="5-Fold Cross-Validation">5-Fold Cross-Validation</button>
+  </div>
+
+  <div id="quant-panel" class="quant-grid reveal"></div>
+  <div class="quant-note" id="quant-note"></div>
+</section>
+
+<!-- ===================== CITATION ===================== -->
+<section class="section section-narrow" id="citation">
+  <div class="section-header reveal">
+    <div class="index">Citation</div>
+    <h2>BibTeX</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="cite reveal">
+    <button class="cite-copy" data-copy-target="#bibtex">Copy</button>
+    <pre id="bibtex"><code>@inproceedings{kim2026delaunay,
+  title     = {Delaunay Canopy: Building Wireframe Reconstruction from Airborne LiDAR Point Clouds via Delaunay Graph},
+  author    = {Kim, Donghyun and Kim, Chanyoung and Kwon, Youngjoong and Hwang, Seong Jae},
+  booktitle = {Proceedings of the European Conference on Computer Vision (ECCV)},
+  year      = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>
+    Licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    Design inspired by the <a href="https://anttwo.github.io/surflo/">Surflo</a> project page.
+  </p>
+</footer>
+
+</body>
+</html>
