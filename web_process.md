@@ -37,7 +37,7 @@ surflo 디자인 핵심 (재현 대상)
 - 넣기로 한 fancy 장치. 3D PLY 뷰어 캐러셀, Hero WebGL 배경, before/after 비교 슬라이더, 테마 토글, 애니메이션 bar chart. (전부 구현됨)
 - figure는 사용자가 PDF로 제공 -> `pdftoppm -png -r 300` 으로 PNG 변환 후 PIL로 흰 여백 crop -> 흰색 라운드 카드(`.figure.card`)로 감쌈. 카드는 상하좌우 동일 여백(padding 2%) + soft shadow.
 - 헤더 버튼. Paper, Supplementary(아이콘은 Paper와 동일 fa-file-pdf), arXiv, Code(GitHub 로고). magnetic 커서 추적 효과는 끔.
-- arXiv 링크. https://arxiv.org/abs/2604.02497 (연결됨). Code 버튼은 아직 `#` 자리표시 (GitHub repo URL 미정).
+- arXiv 링크. https://arxiv.org/abs/2604.02497 (연결됨). Code 버튼은 https://github.com/dannyboy0103/delaunay-canopy 로 연결됨.
 
 ## 4. 글쓰기 규칙 (CLAUDE.md, 사이트 산문에도 적용)
 
@@ -59,23 +59,26 @@ surflo 디자인 핵심 (재현 대상)
 ```
 delaunay-canopy-web/
   index.html                 메인 페이지 (섹션 전부 여기)
+  README.md                  저장소 소개, 로컬 실행법, tools 설명
   web_process.md             이 문서
+  .gitignore
   tools/
     prepare_models.py        Building3D txt/obj -> 웹용 ply/obj 변환기 (아래 13절)
     crop_aligned.py          같은 카메라로 뽑은 렌더 여러 장을 정렬 유지한 채 crop
   static/
     css/style.css            전체 디자인 시스템 (다크/라이트 토큰, 모든 컴포넌트)
     js/
-      site.js                테마토글, scroll-reveal, magnetic(꺼둠), 비교슬라이더, 복사버튼, bar chart(Table1 데이터 내장), figure placeholder
-      viewer.js              Three.js (ES module). hero pair 크로스페이드 + 뷰어 캐러셀 + 절차적 hip-roof fallback
+      site.js                테마토글, scroll-reveal, magnetic(꺼둠), 복사버튼, Corner Score Sampling 애니메이션, Quantitative 차트, figure placeholder
+      viewer.js              Three.js (ES module). hero pair 크로스페이드 + multi pane 뷰어 + 절차적 hip-roof fallback
     images/
-      teaser.pdf, teaser.png            Fig.1 teaser (PDF 원본 + 변환 PNG, crop됨)
-      teaser_orig_backup.png            crop 전 백업
-      overall.pdf, pipeline.png         Fig.4 overall pipeline (PDF 원본 + 변환 PNG, crop됨)
+      teaser.png                        Fig.1 teaser
+      pipeline.png                      Fig.4 overall pipeline
+      scoring.png                       Delaunay Graph Scoring 그림, 1600x570
+      path_score.png                    Wire-Wise Path Score 그림, 856x810
       samp_6341_*.png                   Corner Score Sampling 용, 건물 6341, 822x736
       samp_41089_*.png                  같은 용도, 건물 41089, 1167x718
         key 는 pcd(입력 점구름), wf(GT wireframe), cs150/cs500(우리 샘플링), fps150/fps500
-      raw/                              crop 전 원본 PNG 12장
+      raw/                              crop 전 원본 전부. sampling PNG 12장, figure 원본 PDF(overall, teaser, figuresforwebsite), teaser crop 전 백업
     models/                  b<건물번호>_<key>.<확장자>. key 는 뷰어의 data-items 키와 같다
       b33630_pc/wf           hero 배경용. 5249점, 24.9 x 26.0 x 6.4m
       b7926_pc/wf            Qualitative Results 1번 칸. 5487점, 26.4 x 23.7 x 5.8m
@@ -108,7 +111,7 @@ delaunay-canopy-web/
 2. meta (`#meta`). 저자/소속/교신/venue/버튼. 중앙 정렬.
 3. TL;DR (`#tldr`). 헤더 "TL;DR"(index-title, 큰 accent). statement 한 줄("Delaunay Canopy"는 accent, "Delaunay graph"는 italic). Fig.1 teaser(흰 카드). 논문 Fig.1 caption(첫 문장 뺌). TL;DR 카드 3개.
 4. Overview (`#overview`). 헤더 "Overview - From point cloud to wireframe"(전체 accent). pipeline 그림(흰 카드, caption 없음). bullet 3개(scoring/corner/wire, 논문 원문 최대한 반영).
-5. Delaunay Graph Scoring (`#scoring`). **[완료, 2026-08-17]** 도입 문단 + `scoring.jpg` 전체 폭 흰 카드 + 아래 2열로 Eq.1 dihedral angle, Eq.2 corner score. 그림이 Graph -> Edge-Wise Dihedral Angle -> Vertex-Wise Corner Score 3단계라서 아래 두 수식이 그림의 2, 3번째 칸에 대응한다. 3D 로 대체하려던 계획은 취소하고 사용자가 준 그림을 쓴다.
+5. Delaunay Graph Scoring (`#scoring`). **[완료, 2026-08-17]** 도입 문단 + `scoring.png` 전체 폭 흰 카드 + 아래 2열로 Eq.1 dihedral angle, Eq.2 corner score. 그림이 Graph -> Edge-Wise Dihedral Angle -> Vertex-Wise Corner Score 3단계라서 아래 두 수식이 그림의 2, 3번째 칸에 대응한다. 3D 로 대체하려던 계획은 취소하고 사용자가 준 그림을 쓴다.
 6. Corner Score Sampling (`#sampling`). **[완료, 2026-08-17]** 논문 Fig.5 에 대응한다. 칸 두 개로, 건물 6341 하나에 방법 두 개(우리 corner score sampling, FPS)다. 41089 는 사용자가 보고 뺐다 (`static/images/samp_41089_*.png` 는 남아 있으니 `data-buildings` 에 다시 넣으면 살아난다). 각 칸에서 입력 점구름(opacity 0.3)과 GT wireframe(0.55)을 항상 깔아두고, 그 위가 **Input point cloud -> 500 sampling points -> 150 sampling points** 세 단계로 자동 전환된다. 2.0초 유지, 0.9초 페이드, 한 주기 8.7초. 단계 이름은 칸 아래 가운데에 뜬다. 논문은 K 로 쓰지만 사이트에서는 변수 없이 풀어 쓰기로 했다 (사용자 요청). **루프는 앞으로만 돈다.** 샘플링은 점을 덜어내는 일이라 되감으면 점이 다시 자라나는 것처럼 보이기 때문이다. 마지막 단계에서 첫 단계로 접히는 것은 다시 시작하는 것으로 읽힌다. 두 칸이 시계 하나를 공유해서 항상 같은 단계에 있다. 오른쪽 아래에 현재 단계 이름이 표시된다.
    - 3D 가 아니라 **레이어로 겹친 PNG** 다. 12장이 전부 같은 카메라로 렌더된 투명 배경이라 정렬 작업이 필요 없다.
    - 코드는 `site.js` 의 `initSampling`, CSS 는 `.samp-*`. 마크업에 건물 목록, 방법 목록, 단계 목록을 주면 파일 이름을 조합해서 칸을 만든다. 단계는 `{"file":"...","label":"..."}` 이고 `file` 안의 `{m}` 이 방법 키로 치환된다. 그래서 `pcd` 처럼 방법과 무관한 단계와 `{m}500` 처럼 방법별인 단계를 섞을 수 있다. 건물이나 단계를 늘리면 격자와 타임라인이 따라간다.
@@ -208,15 +211,36 @@ delaunay-canopy-web/
 - [대기] Corner Score Sampling 3D. Ours(K=150) vs FPS(K=150) 토글, GT wireframe 겹침.
 - [완료] Quantitative 개편. 12절 참고.
 - [대기] supplementary 의 Tokyo LoD2 cross-dataset 결과(supp Table 3, 4)를 다섯 번째 버튼으로 넣을지 미정.
-- [대기] 섹션 헤더 스타일 통일, 배포.
+- [완료] 배포. 10-1절 참고.
+- [완료] 섹션 헤더 스타일 통일. 모든 섹션이 `h2.header-inline` accent 한 줄로 통일됐다 (TL;DR 만 `index-title` 유지).
 
 미정/확인 필요
-- Code 버튼 GitHub repo URL.
-- 배포용 github.io repo 이름(상대경로라 기능엔 무영향).
-- 섹션 헤더 스타일 통일 방식.
 - 각 섹션 caption/문구 최종 확정(대부분 아직 Claude 의역 상태).
 - `raw/33630_o.txt` 의 8번째 열이 무엇인지 (0.29~1.0 스칼라). 6번째 열은 intensity 로 보인다. 3~5열이 rgb.
 - 기존 `#viewer`, `#sampling`, `#qualitative` 섹션의 옛 마크업(캐러셀, 비교 슬라이더)은 아직 index.html 에 남아 있다. 각 섹션 세션에서 교체될 예정.
+
+## 10-1. 배포 (2026-08-17)
+
+**공개됨.** <https://dannyboy0103.github.io/delaunay-canopy/>
+저장소 <https://github.com/dannyboy0103/delaunay-canopy> (public, GitHub Pages 는 main 브랜치 루트).
+
+- 계정은 `dannyboy0103`. `gh` CLI 로 로그인되어 있다.
+- 배포는 그냥 push 다. main 에 올리면 Pages 가 다시 빌드한다. 첫 빌드는 `errored` 로 몇 번 뜨다가 1분쯤 뒤 `built` 이 됐다. 상태 확인은 `gh api repos/dannyboy0103/delaunay-canopy/pages --jq '.status'`.
+- 헤더의 Code 버튼이 이 저장소를 가리킨다.
+- `README.md` 를 새로 썼다. 로컬 실행법, 폴더 구조, `tools/` 두 스크립트 설명이 들어 있다.
+
+**PDF 를 압축해서 올렸다.** 원본은 내부 이미지가 2956ppi 라 본문 32.6MB, supplementary 15.1MB 였다. ghostscript 로 이미지를 200dpi 로 낮춰 각각 2.3MB, 2.5MB 가 됐다. 12쪽(Fig.6 이 있는 이미지 많은 쪽)을 렌더해서 대조했고 글자와 그림 모두 깨끗했다. 저장소 전체는 62MB 에서 19MB 가 됐다.
+```
+gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.5 -dNOPAUSE -dQUIET -dBATCH \
+   -dDetectDuplicateImages=true \
+   -dDownsampleColorImages=true -dColorImageResolution=200 -dColorImageDownsampleType=/Bicubic \
+   -dDownsampleGrayImages=true -dGrayImageResolution=200 -dGrayImageDownsampleType=/Bicubic \
+   -dDownsampleMonoImages=true -dMonoImageResolution=600 \
+   -sOutputFile=out.pdf in.pdf
+```
+**압축 안 된 원본은 저장소 바깥, 프로젝트 상위 폴더의 `_ECCV_2026_camera_ready__*.pdf` 에 그대로 있다.** 사이트용 PDF 를 다시 만들 일이 생기면 그것을 압축하면 된다.
+
+figure 원본 PDF(`overall.pdf`, `teaser.pdf`)와 crop 전 백업은 `static/images/raw/` 로 옮겼다.
 
 ## 11. 로컬 미리보기 방법
 
