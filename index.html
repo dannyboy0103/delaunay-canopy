@@ -160,35 +160,50 @@
   </div>
 
   <p class="prose reveal">
-    We apply Delaunay triangulation to the airborne LiDAR point cloud to approximate its underlying
-    surface, producing a graph \(G=(V,E,F)\). Scoring that graph turns raw geometry into curvature
-    signatures, first on its edges and then on its vertices.
+    Key features in 3D buildings (e.g., corners) exhibit pronounced local curvature. This observation
+    raises a question. Can a curvature metric be leveraged as a strong prior to inform the topology and
+    guide wireframe reconstruction? To investigate, we first introduce Delaunay graph scoring, which
+    approximates the underlying surface of the point cloud and computes region-wise curvature metrics.
+  </p>
+  <p class="prose reveal">
+    Unlike many conventional 3D object point clouds, airborne LiDAR scans of building roofs inherently
+    represent surfaces with open topologies, since for a given \((x, y)\) coordinate the \(z\) value is
+    mapped without occlusion. This property enables us to estimate an implicit representation of the
+    point cloud's underlying surface. Building upon this, we apply Delaunay triangulation to the
+    airborne LiDAR building point cloud to approximate its underlying surface. This process generates a
+    Delaunay graph \(G = (V, E, F)\), which holds both mesh and graph properties and comprises vertices
+    \(V\), edges \(E\), and faces \(F\). To estimate the curvature of a specific region, we derive
+    geometric priors upon the Delaunay graph and assign them to the graph's components in three steps.
   </p>
 
   <div class="figure card reveal" style="margin-top:1.6rem;">
     <img data-fig src="./static/images/scoring.png" alt="Delaunay graph scoring, from the graph to edge-wise dihedral angles to vertex-wise corner scores">
   </div>
 
-  <div class="cols" style="margin-top:2rem;align-items:start;">
-    <div class="prose reveal">
+  <div class="cols cols-3 reveal" style="margin-top:2rem;align-items:start;">
+    <div class="prose">
       <p>
-        <strong>Edge-wise dihedral angle.</strong> For an edge \(e\) with adjacent faces of normals
-        \(\mathbf{n}_1\) and \(\mathbf{n}_2\), the dihedral angle measures how sharply the surface bends
-        across that edge.
+        <strong>Face Normal Computation.</strong> For every face within the Delaunay graph, the normal
+        vector is computed from its three constituent vertices. To ensure consistent normal orientation,
+        a normal vector that points downward is inverted.
       </p>
-      <div class="eq">
-        $$\theta_e = \arccos\!\left(\frac{\mathbf{n}_1 \cdot \mathbf{n}_2}{\lVert\mathbf{n}_1\rVert\,\lVert\mathbf{n}_2\rVert}\right) \in [0,\pi].$$
-      </div>
     </div>
-    <div class="prose reveal">
+    <div class="prose">
       <p>
-        <strong>Vertex-wise corner score.</strong> At the most granular level of the graph, aggregating
-        the dihedral angles of all incident edges \(E(v)\) yields a corner score, where a high value
-        flags significant local curvature.
+        <strong>Edge-Wise Dihedral Angle.</strong> With the face normals in hand, curvature-related
+        geometric information is computed at the edge level as the dihedral angle between the two faces
+        adjacent to each edge. A large dihedral angle signifies a sharp fold or corner where the two
+        adjacent faces meet, whereas a small angle indicates that the region is relatively flat.
       </p>
-      <div class="eq">
-        $$S_c(v) = \frac{1}{|E(v)|}\sum_{e \in E(v)} \theta_e.$$
-      </div>
+    </div>
+    <div class="prose">
+      <p>
+        <strong>Vertex-Wise Corner Score.</strong> At the most granular level of the graph, the vertex,
+        a corner score is determined by aggregating the dihedral angles of all incident edges. A high
+        corner score implies the presence of numerous edges with high dihedral angles, suggesting that
+        the local region around that vertex has significant curvature and the vertex is highly likely to
+        be an actual corner of the building.
+      </p>
     </div>
   </div>
 </section>

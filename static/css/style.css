@@ -389,6 +389,9 @@ html[data-theme="light"] .hero-vignette {
   gap: 2.5rem;
   align-items: center;
 }
+/* three column, for a stage-by-stage walk through one figure */
+.cols-3 { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.cols-3 .prose { text-align: left; max-width: none; }
 
 /* ===================== Placeholder for missing figures ===================== */
 .asset-placeholder {
