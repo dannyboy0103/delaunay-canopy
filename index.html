@@ -160,20 +160,9 @@
   </div>
 
   <p class="prose reveal">
-    Key features in 3D buildings (e.g., corners) exhibit pronounced local curvature. This observation
-    raises a question. Can a curvature metric be leveraged as a strong prior to inform the topology and
-    guide wireframe reconstruction? To investigate, we first introduce Delaunay graph scoring, which
-    approximates the underlying surface of the point cloud and computes region-wise curvature metrics.
-  </p>
-  <p class="prose reveal">
-    Unlike many conventional 3D object point clouds, airborne LiDAR scans of building roofs inherently
-    represent surfaces with open topologies, since for a given \((x, y)\) coordinate the \(z\) value is
-    mapped without occlusion. This property enables us to estimate an implicit representation of the
-    point cloud's underlying surface. Building upon this, we apply Delaunay triangulation to the
-    airborne LiDAR building point cloud to approximate its underlying surface. This process generates a
-    Delaunay graph \(G = (V, E, F)\), which holds both mesh and graph properties and comprises vertices
-    \(V\), edges \(E\), and faces \(F\). To estimate the curvature of a specific region, we derive
-    geometric priors upon the Delaunay graph and assign them to the graph's components in three steps.
+    We apply Delaunay triangulation to the airborne LiDAR building point cloud to approximate its
+    underlying surface. This process generates a Delaunay graph \(G = (V, E, F)\), and geometric priors
+    for curvature characterization are assigned to its faces, edges, and vertices in turn.
   </p>
 
   <div class="figure card reveal" style="margin-top:1.6rem;">
@@ -184,25 +173,21 @@
     <div class="prose">
       <p>
         <strong>Face Normal Computation.</strong> For every face within the Delaunay graph, the normal
-        vector is computed from its three constituent vertices. To ensure consistent normal orientation,
-        a normal vector that points downward is inverted.
+        vector is computed from its three constituent vertices.
       </p>
     </div>
     <div class="prose">
       <p>
-        <strong>Edge-Wise Dihedral Angle.</strong> With the face normals in hand, curvature-related
-        geometric information is computed at the edge level as the dihedral angle between the two faces
-        adjacent to each edge. A large dihedral angle signifies a sharp fold or corner where the two
-        adjacent faces meet, whereas a small angle indicates that the region is relatively flat.
+        <strong>Edge-Wise Dihedral Angle.</strong> A large dihedral angle at an edge signifies a sharp
+        fold or corner where the two adjacent faces meet, whereas a small angle indicates that the
+        region is relatively flat.
       </p>
     </div>
     <div class="prose">
       <p>
-        <strong>Vertex-Wise Corner Score.</strong> At the most granular level of the graph, the vertex,
-        a corner score is determined by aggregating the dihedral angles of all incident edges. A high
-        corner score implies the presence of numerous edges with high dihedral angles, suggesting that
-        the local region around that vertex has significant curvature and the vertex is highly likely to
-        be an actual corner of the building.
+        <strong>Vertex-Wise Corner Score.</strong> A high corner score implies the presence of numerous
+        edges with high dihedral angles, suggesting that the vertex is highly likely to be an actual
+        corner of the building.
       </p>
     </div>
   </div>
