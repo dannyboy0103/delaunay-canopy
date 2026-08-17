@@ -824,15 +824,15 @@ html[data-theme="light"] .samp-cell {
   white-space: nowrap;
 }
 
-.qdot {
+.qbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 44px;
   grid-template-areas: 'name value' 'track value';
   align-items: center;
   column-gap: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
-.qdot-name {
+.qbar-name {
   grid-area: name;
   font-size: 0.72rem;
   line-height: 1.25;
@@ -841,36 +841,23 @@ html[data-theme="light"] .samp-cell {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* A dot on a track, not a bar. Position carries the value, so the scale can be
-   zoomed to the range being compared without the mark overstating anything. */
-.qdot-track {
+.qbar-track {
   grid-area: track;
-  position: relative;
-  height: 11px;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  overflow: hidden;
 }
-.qdot-track::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: var(--border);
+.qbar-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 4px 0 0 4px;
+  background: rgba(var(--lav-rgb), 0.4);
+  transition: width 900ms var(--ease-out);
 }
-.qdot-mark {
-  position: absolute;
-  top: 50%;
-  left: 14%;
-  width: 9px;
-  height: 9px;
-  margin: -4.5px 0 0 -4.5px;
-  border-radius: 50%;
-  background: var(--muted-text);
-  /* Surface ring, so dots that land close together stay separable. */
-  box-shadow: 0 0 0 2px var(--bg-color);
-  transition: left 900ms var(--ease-out);
-}
-.qdot-val {
+.qbar-val {
   grid-area: value;
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -879,12 +866,12 @@ html[data-theme="light"] .samp-cell {
 }
 /* The winner of a metric is marked whoever it is, so a chart where a baseline
    still leads reads as plainly as one where we do. */
-.qdot.is-best .qdot-val { color: var(--text-color); font-weight: 500; }
-.qdot.is-best .qdot-mark { background: var(--text-color); }
-.qdot.is-ours .qdot-name { color: var(--accent); }
-.qdot.is-ours .qdot-val { color: var(--accent); }
-.qdot.is-ours .qdot-mark { background: var(--accent); width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; }
-.qdot.is-empty .qdot-val { color: var(--muted-text); }
+.qbar.is-best .qbar-val { color: var(--text-color); font-weight: 500; }
+.qbar.is-best .qbar-track { border-color: var(--hairline); }
+.qbar.is-ours .qbar-name { color: var(--accent); }
+.qbar.is-ours .qbar-val { color: var(--accent); }
+.qbar.is-ours .qbar-fill { background: linear-gradient(90deg, var(--accent), rgba(var(--lav-rgb), 0.9)); }
+.qbar.is-empty .qbar-val { color: var(--muted-text); }
 
 /* The two ends of the zoomed range, spelled out so the scale is never implied. */
 .quant-axis {

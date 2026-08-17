@@ -212,10 +212,10 @@
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // Where the weakest and the strongest value sit along the track. Leaving a
-    // margin at both ends is what opens up the middle, so scores that differ by
-    // a point or two stop landing on top of each other.
-    var LO = 14, HI = 93;
+    // How much of the track the weakest and the strongest value fill. Starting
+    // the weakest well along the track is what opens up the middle, so scores
+    // that differ by a point or two stop looking identical.
+    var LO = 34, HI = 100;
 
     function chart(key, rows) {
       var md = QUANT.metrics[key];
@@ -229,19 +229,21 @@
       var body = rows.map(function (r) {
         var v = r[key];
         if (v === null || v === undefined) {
-          return '<div class="qdot is-empty"><span class="qdot-name">' + esc(r.name) + '</span>' +
-            '<span class="qdot-track"></span><span class="qdot-val">n/a</span></div>';
+          return '<div class="qbar is-empty"><span class="qbar-name">' + esc(r.name) + '</span>' +
+            '<span class="qbar-track"></span><span class="qbar-val">n/a</span></div>';
         }
-        var cls = 'qdot' + (r.ours ? ' is-ours' : '') + (v === best ? ' is-best' : '');
-        // A dot encodes position rather than length, so the scale does not have
-        // to reach zero to stay honest. The axis is zoomed to the values being
-        // compared, and better always lies to the right, whichever direction the
-        // metric improves in. The two ends of the range are printed underneath.
-        var pos = span === 0 ? (LO + HI) / 2 : LO + ((v - worst) / span) * (HI - LO);
+        var cls = 'qbar' + (r.ours ? ' is-ours' : '') + (v === best ? ' is-best' : '');
+        // The scale is zoomed to the values being compared rather than anchored
+        // at zero, since these scores sit close together and a zero baseline
+        // leaves every method looking alike. Bar length is therefore relative to
+        // that window, not to the value itself, so both ends of the window are
+        // printed under the panel. Longer always means better, whichever
+        // direction the metric improves in.
+        var w = span === 0 ? (LO + HI) / 2 : LO + ((v - worst) / span) * (HI - LO);
         return '<div class="' + cls + '">' +
-          '<span class="qdot-name">' + esc(r.name) + '</span>' +
-          '<span class="qdot-track"><span class="qdot-mark" data-pos="' + pos.toFixed(1) + '"></span></span>' +
-          '<span class="qdot-val">' + v.toFixed(md.digits) + '</span></div>';
+          '<span class="qbar-name">' + esc(r.name) + '</span>' +
+          '<span class="qbar-track"><span class="qbar-fill" data-w="' + w.toFixed(1) + '"></span></span>' +
+          '<span class="qbar-val">' + v.toFixed(md.digits) + '</span></div>';
       }).join('');
 
       return '<div class="quant-card" data-metric="' + key + '">' +
@@ -263,8 +265,8 @@
       });
       panel.innerHTML = html;
       requestAnimationFrame(function () {
-        panel.querySelectorAll('.qdot-mark').forEach(function (d) {
-          d.style.left = d.getAttribute('data-pos') + '%';
+        panel.querySelectorAll('.qbar-fill').forEach(function (f) {
+          f.style.width = f.getAttribute('data-w') + '%';
         });
       });
       root.querySelectorAll('.quant-dataset').forEach(function (t) {
