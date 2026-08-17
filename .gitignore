@@ -1,3 +1,6 @@
 .DS_Store
 *.swp
 node_modules/
+
+# Internal working log, kept local rather than published.
+web_process.md
