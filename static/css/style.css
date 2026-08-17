@@ -194,7 +194,6 @@ html[data-theme="light"] .hero-vignette {
   letter-spacing: -0.01em;
   margin: 0.5rem 0 1rem 0;
 }
-.section-header .header-inline .accent { color: var(--accent); }
 .section-header .index-title {
   font-family: var(--font-sans);
   font-weight: 100;
