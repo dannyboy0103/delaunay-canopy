@@ -178,16 +178,18 @@
     </div>
     <div class="prose">
       <p>
-        <strong>Edge-Wise Dihedral Angle.</strong> A large dihedral angle at an edge signifies a sharp
-        fold or corner where the two adjacent faces meet, whereas a small angle indicates that the
-        region is relatively flat.
+        <strong>Edge-Wise Dihedral Angle.</strong> For every edge, the dihedral angle is the angle between
+        the normal vectors of its two adjacent faces, falling in \([0, \pi]\). A large dihedral angle
+        signifies a sharp fold or corner where the two adjacent faces meet, whereas a small angle
+        indicates that the region is relatively flat.
       </p>
     </div>
     <div class="prose">
       <p>
-        <strong>Vertex-Wise Corner Score.</strong> A high corner score implies the presence of numerous
-        edges with high dihedral angles, suggesting that the vertex is highly likely to be an actual
-        corner of the building.
+        <strong>Vertex-Wise Corner Score.</strong> For every vertex, the corner score is determined by
+        aggregating the dihedral angles of all its incident edges into their mean. A high corner score
+        implies the presence of numerous edges with high dihedral angles, suggesting that the vertex is
+        highly likely to be an actual corner of the building.
       </p>
     </div>
   </div>
