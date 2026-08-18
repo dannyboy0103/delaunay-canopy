@@ -152,10 +152,10 @@
       EF1: { label: 'Wire F1', higher: true, digits: 1 }
     },
     notes: {
-      'Tallinn City': 'Building3D Tallinn city dataset, paper Table 1. MODEL* denotes a feature extractor inside the Point2Roof pipeline.',
-      'Entry-Level': 'Building3D entry-level dataset, paper Table 1. MODEL* denotes a feature extractor inside the Point2Roof pipeline.',
-      'Official Leaderboard': 'Official Building3D Tallinn city leaderboard protocol, supplementary Table 1. Baseline numbers come from the public leaderboard, which does not report WED. MODEL† denotes a backbone inside the standard Building3D architecture.',
-      '5-Fold Cross-Validation': '5-fold cross-validation over the combined training and test sets, supplementary Table 2. MODEL* denotes a feature extractor inside the Point2Roof pipeline.'
+      'Tallinn City': 'The notation MODEL<sup>*</sup> signifies a model acting as the feature extractor within the Point2Roof pipeline.',
+      'Entry-Level': 'The notation MODEL<sup>*</sup> signifies a model acting as the feature extractor within the Point2Roof pipeline.',
+      'Official Leaderboard': 'The notation MODEL<sup>†</sup> designates models acting exclusively as the feature extraction backbone within the standard Building3D architecture.',
+      '5-Fold Cross-Validation': 'The notation MODEL<sup>*</sup> signifies a model acting as the feature extractor within the Point2Roof pipeline.'
     },
     data: {
       'Tallinn City': [
@@ -212,6 +212,11 @@
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    // Raise a trailing asterisk or dagger in a method name into a superscript.
+    function supName(s) {
+      return esc(s).replace(/([*†])$/, '<sup>$1</sup>');
+    }
+
     // How much of the track the weakest and the strongest value fill. Starting
     // the weakest well along the track is what opens up the middle, so scores
     // that differ by a point or two stop looking identical.
@@ -229,7 +234,7 @@
       var body = rows.map(function (r) {
         var v = r[key];
         if (v === null || v === undefined) {
-          return '<div class="qbar is-empty"><span class="qbar-name">' + esc(r.name) + '</span>' +
+          return '<div class="qbar is-empty"><span class="qbar-name">' + supName(r.name) + '</span>' +
             '<span class="qbar-track"></span><span class="qbar-val">n/a</span></div>';
         }
         var cls = 'qbar' + (r.ours ? ' is-ours' : '') + (v === best ? ' is-best' : '');
@@ -241,7 +246,7 @@
         // direction the metric improves in.
         var w = span === 0 ? (LO + HI) / 2 : LO + ((v - worst) / span) * (HI - LO);
         return '<div class="' + cls + '">' +
-          '<span class="qbar-name">' + esc(r.name) + '</span>' +
+          '<span class="qbar-name">' + supName(r.name) + '</span>' +
           '<span class="qbar-track"><span class="qbar-fill" data-w="' + w.toFixed(1) + '"></span></span>' +
           '<span class="qbar-val">' + v.toFixed(md.digits) + '</span></div>';
       }).join('');
@@ -272,7 +277,7 @@
       root.querySelectorAll('.quant-dataset').forEach(function (t) {
         t.classList.toggle('is-active', t.getAttribute('data-dataset') === state.dataset);
       });
-      if (noteEl) noteEl.textContent = QUANT.notes[state.dataset] || '';
+      if (noteEl) noteEl.innerHTML = QUANT.notes[state.dataset] || '';
     }
 
     root.querySelectorAll('.quant-dataset').forEach(function (t) {

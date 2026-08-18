@@ -177,6 +177,7 @@ html[data-theme="light"] .hero-vignette {
   padding: var(--section-pad) 1.5rem;
 }
 .section-narrow { max-width: 900px; }
+#citation { padding-bottom: calc(var(--section-pad) + 3rem); }
 
 .section-header {
   margin-bottom: 2.5rem;
@@ -309,7 +310,7 @@ html[data-theme="light"] .hero-vignette {
   color: var(--text-color);
 }
 .statement .accent { color: var(--accent); }
-.prose { color: var(--subdued-text); text-align: justify; hyphens: auto; max-width: 900px; }
+.prose { color: var(--subdued-text); text-align: justify; hyphens: auto; }
 .prose p { margin: 0 0 1.1rem 0; }
 
 /* ===================== TL;DR cards ===================== */
@@ -334,6 +335,147 @@ html[data-theme="light"] .hero-vignette {
 }
 .info-card h3 { font-weight: 500; font-size: 1.1rem; margin: 0 0 0.5rem 0; }
 .info-card p { color: var(--subdued-text); font-size: 0.95rem; margin: 0; }
+
+/* Flow variant, cards connected by an arrow into the next step */
+.card-grid.is-flow { gap: 46px; }
+.card-grid.is-flow .info-card { position: relative; }
+.card-grid.is-flow .info-card:not(:last-child)::after {
+  content: "\f054"; /* Font Awesome chevron-right */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 0.72rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: -38px;
+  width: 30px;
+  height: 30px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  border: 1px solid rgba(var(--accent-rgb), 0.45);
+  background: var(--card-bg);
+  color: var(--accent);
+  pointer-events: none;
+  transition: transform 0.25s var(--ease-out), border-color 0.25s;
+}
+.card-grid.is-flow .info-card:not(:last-child):hover::after {
+  transform: translateY(-50%) scale(1.12);
+  border-color: rgba(var(--accent-rgb), 0.85);
+}
+
+@media (max-width: 820px) {
+  .card-grid.is-flow .info-card:not(:last-child)::after {
+    content: "\f078"; /* chevron-down */
+    top: auto;
+    right: 50%;
+    bottom: -38px;
+    transform: translateX(50%);
+  }
+  .card-grid.is-flow .info-card:not(:last-child):hover::after {
+    transform: translateX(50%) scale(1.12);
+  }
+}
+
+/* ===================== Wire-wise path score figure ===================== */
+.ps-figure {
+  margin: 0;
+  padding: 1.4rem 1rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ps-graph {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  overflow: visible;
+}
+.ps-edges line {
+  stroke: var(--subdued-text);
+  stroke-opacity: 0.34;
+  stroke-width: 4;
+}
+.ps-nodes circle { fill: var(--text-color); }
+.ps-end {
+  fill: var(--accent);
+  stroke: var(--bg-color);
+  stroke-width: 4;
+}
+.ps-cand {
+  fill: none;
+  stroke: var(--lav);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 1 18;
+}
+.ps-path {
+  fill: none;
+  stroke: var(--subdued-text);
+  stroke-opacity: 0.34;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ps-seg {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.85));
+}
+.ps-seg.s1 { animation: ps-seg1 5s linear infinite; }
+.ps-seg.s2 { animation: ps-seg2 5s linear infinite; }
+.ps-seg.s3 { animation: ps-seg3 5s linear infinite; }
+@keyframes ps-seg1 {
+  0% { stroke-dashoffset: var(--len); opacity: 1; }
+  14% { stroke-dashoffset: 0; opacity: 1; }
+  84% { stroke-dashoffset: 0; opacity: 1; }
+  85% { stroke-dashoffset: 0; opacity: 0; }
+  86%, 100% { stroke-dashoffset: var(--len); opacity: 0; }
+}
+@keyframes ps-seg2 {
+  0%, 14% { stroke-dashoffset: var(--len); opacity: 1; }
+  28% { stroke-dashoffset: 0; opacity: 1; }
+  84% { stroke-dashoffset: 0; opacity: 1; }
+  85% { stroke-dashoffset: 0; opacity: 0; }
+  86%, 100% { stroke-dashoffset: var(--len); opacity: 0; }
+}
+@keyframes ps-seg3 {
+  0%, 28% { stroke-dashoffset: var(--len); opacity: 1; }
+  42% { stroke-dashoffset: 0; opacity: 1; }
+  84% { stroke-dashoffset: 0; opacity: 1; }
+  85% { stroke-dashoffset: 0; opacity: 0; }
+  86%, 100% { stroke-dashoffset: var(--len); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ps-seg { animation: none; stroke-dashoffset: 0; opacity: 1; }
+}
+.ps-legend {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 1.4rem;
+  padding: 0.9rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card-bg);
+}
+.ps-legend-row { display: flex; align-items: center; gap: 0.7rem; }
+.ps-legend-row svg { flex: none; overflow: visible; }
+.ps-legend-row .ps-cand { stroke-width: 3; stroke-dasharray: 1 7; }
+.ps-legend-row .ps-path { stroke: var(--accent); stroke-opacity: 1; stroke-width: 3.5; }
+.ps-legend-row span {
+  color: var(--subdued-text);
+  font-size: 0.95rem;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.01em;
+}
 
 /* ===================== Figures ===================== */
 .figure { margin: 1.5rem 0; }

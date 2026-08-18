@@ -169,7 +169,7 @@
     <img data-fig src="./static/images/scoring.png" alt="Delaunay graph scoring, from the graph to edge-wise dihedral angles to vertex-wise corner scores">
   </div>
 
-  <div class="card-grid reveal-stagger" style="margin-top:2rem;">
+  <div class="card-grid is-flow reveal-stagger" style="margin-top:2rem;">
     <div class="info-card">
       <h3>Face Normal Computation</h3>
       <p>For every face within the Delaunay graph, the normal vector is computed from its three
@@ -198,10 +198,11 @@
     <div class="rule"></div>
   </div>
   <p class="prose reveal" style="margin-bottom:1.5rem;">
-    Each panel runs from the raw input point cloud down to 500 points and then to 150 points, with the
-    ground truth wireframe kept faintly visible throughout. While farthest point sampling spreads its
-    budget evenly over the surface, corner score sampling retains points located in areas of pronounced
-    curvature (roof corners and edges), making them highly probable corner candidates.
+    As shown below, each panel samples the points with the highest corner scores, first 500 and then 150.
+    While farthest point sampling performs a uniform sampling, corner score sampling retains points located
+    in areas of pronounced curvature (roof corners and edges), making them highly probable corner
+    candidates. The corner selection module then refines this focused subset into the final set of
+    predicted corners.
   </p>
 
   <div class="samp-viewer reveal"
@@ -229,24 +230,75 @@
 
   <div class="cols" style="align-items:start;">
     <div class="reveal">
-      <div class="figure card">
-        <img data-fig src="./static/images/path_score.png" alt="A wire candidate and the shortest Delaunay path between its two endpoints">
-      </div>
+      <figure class="ps-figure" role="img"
+              aria-label="A Delaunay graph with a wire candidate drawn as a straight dashed chord between two endpoints, and the shortest path between them traced along the graph edges">
+        <svg class="ps-graph" viewBox="130 148 594 427" preserveAspectRatio="xMidYMid meet">
+          <g class="ps-edges">
+            <line x1="377" y1="178" x2="555" y2="294"/>
+            <line x1="377" y1="178" x2="421" y2="325"/>
+            <line x1="694" y1="178" x2="555" y2="294"/>
+            <line x1="259" y1="270" x2="421" y2="325"/>
+            <line x1="259" y1="270" x2="394" y2="418"/>
+            <line x1="259" y1="270" x2="279" y2="446"/>
+            <line x1="555" y1="294" x2="421" y2="325"/>
+            <line x1="555" y1="294" x2="629" y2="346"/>
+            <line x1="421" y1="325" x2="629" y2="346"/>
+            <line x1="421" y1="325" x2="394" y2="418"/>
+            <line x1="629" y1="346" x2="394" y2="418"/>
+            <line x1="629" y1="346" x2="559" y2="545"/>
+            <line x1="160" y1="418" x2="279" y2="446"/>
+            <line x1="394" y1="418" x2="279" y2="446"/>
+            <line x1="394" y1="418" x2="377" y2="545"/>
+            <line x1="394" y1="418" x2="559" y2="545"/>
+            <line x1="279" y1="446" x2="240" y2="545"/>
+            <line x1="279" y1="446" x2="377" y2="545"/>
+          </g>
+          <line class="ps-cand" x1="279" y1="446" x2="555" y2="294"/>
+          <polyline class="ps-path" points="279,446 394,418 421,325 555,294"/>
+          <g class="ps-trace">
+            <line class="ps-seg s1" x1="279" y1="446" x2="394" y2="418" style="--len:118.4"/>
+            <line class="ps-seg s2" x1="394" y1="418" x2="421" y2="325" style="--len:96.9"/>
+            <line class="ps-seg s3" x1="421" y1="325" x2="555" y2="294" style="--len:137.6"/>
+          </g>
+          <g class="ps-nodes">
+            <circle cx="377" cy="178" r="10"/>
+            <circle cx="694" cy="178" r="10"/>
+            <circle cx="259" cy="270" r="10"/>
+            <circle cx="421" cy="325" r="10"/>
+            <circle cx="629" cy="346" r="10"/>
+            <circle cx="160" cy="418" r="10"/>
+            <circle cx="394" cy="418" r="10"/>
+            <circle cx="240" cy="545" r="10"/>
+            <circle cx="377" cy="545" r="10"/>
+            <circle cx="559" cy="545" r="10"/>
+          </g>
+          <circle class="ps-end" cx="279" cy="446" r="13"/>
+          <circle class="ps-end" cx="555" cy="294" r="13"/>
+        </svg>
+        <div class="ps-legend">
+          <div class="ps-legend-row">
+            <svg width="36" height="10" viewBox="0 0 36 10"><line class="ps-cand" x1="2" y1="5" x2="34" y2="5"/></svg>
+            <span>Wire Candidate</span>
+          </div>
+          <div class="ps-legend-row">
+            <svg width="36" height="10" viewBox="0 0 36 10"><line class="ps-path" x1="2" y1="5" x2="34" y2="5"/></svg>
+            <span>Shortest Path</span>
+          </div>
+        </div>
+      </figure>
     </div>
     <div class="prose reveal">
       <p>
-        For a wire candidate \(w_{ij}\) connecting vertices \(v_i\) and \(v_j\), we first find the
-        shortest path \(P^{G}_{i \to j}\) between these two vertices on the Delaunay graph. The edges
-        along that path share the same local region as the wire candidate, so averaging their dihedral
-        angles gives a path score that represents the wire curvature.
+        For each wire candidate connecting two predicted corners, we first find the shortest path
+        between them on the Delaunay graph. The edges along that path share the same local region as
+        the wire candidate, so averaging their dihedral angles gives a path score that represents the
+        wire curvature.
       </p>
-      <div class="eq">
-        $$S_P(v_i, v_j) = \frac{1}{|L(P^{G}_{i \to j})|}\sum_{e \in L(P^{G}_{i \to j})} \theta_e.$$
-      </div>
       <p>
-        Through prior-based query scaling, each wire query is modulated by \(s^{w}=\sigma(S^{w}_{P})\),
-        damping low-score wires and emphasizing high-confidence ones. The model's attention is focused
-        on geometrically plausible structures, leading to stable and accurate wire predictions.
+        Through prior-based query scaling, each wire query is then modulated by its path score, which
+        acts as a scale factor that rescales the query. This damps low-score wires and emphasizes
+        high-confidence ones, focusing the model's attention on geometrically plausible structures and
+        leading to stable and accurate wire predictions.
       </p>
     </div>
   </div>
@@ -292,7 +344,7 @@
     Fully leveraging 3D geometric context, a capability often absent when only 2D information is
     employed, facilitates superior detection of interior corners in addition to those on the periphery.
     Each row is one building, with the input on the left and the two reconstructions sharing the right
-    cell. Drag the divider there to swap between them.
+    cell. Drag the divider there to swap between them, drag anywhere else to orbit.
   </p>
 
   <div class="multi-viewer reveal"
@@ -322,8 +374,8 @@
   </div>
   <p class="prose reveal" style="margin-bottom:1.5rem;">
     Our framework exhibits strong robustness across challenging real-world scenarios, successfully
-    handling cluttered, occluded, and highly complex geometrical cases. Drag a divider to wipe
-    between the input and the reconstruction, drag anywhere else to orbit.
+    handling highly complex geometrical cases. Drag a divider to wipe between the input and the
+    reconstruction, drag anywhere else to orbit.
   </p>
 
   <div class="multi-viewer reveal"
@@ -358,12 +410,6 @@
 
   <div id="quant-panel" class="quant-grid reveal"></div>
   <div class="quant-note" id="quant-note"></div>
-  <div class="quant-note">
-    Each panel is scaled to the values it compares rather than to zero, with the two ends of that range
-    printed underneath, so a longer bar means better whichever direction the metric improves in.
-    Delaunay Canopy carries the accent colour, and the leading value of a metric is highlighted
-    whichever method holds it.
-  </div>
 </section>
 
 <!-- ===================== CITATION ===================== -->
@@ -376,20 +422,13 @@
   <div class="cite reveal">
     <button class="cite-copy" data-copy-target="#bibtex">Copy</button>
     <pre id="bibtex"><code>@inproceedings{kim2026delaunay,
-  title     = {Delaunay Canopy: Building Wireframe Reconstruction from Airborne LiDAR Point Clouds via Delaunay Graph},
-  author    = {Kim, Donghyun and Kim, Chanyoung and Kwon, Youngjoong and Hwang, Seong Jae},
-  booktitle = {Proceedings of the European Conference on Computer Vision (ECCV)},
-  year      = {2026}
+  title        = {Delaunay Canopy: Building Wireframe Reconstruction from Airborne LiDAR Point Clouds via Delaunay Graph},
+  author       = {Kim, Donghyun and Kim, Chanyoung and Kwon, Youngjoong and Hwang, Seong Jae},
+  booktitle    = {European Conference on Computer Vision (ECCV)},
+  year         = {2026}
 }</code></pre>
   </div>
 </section>
-
-<footer class="footer">
-  <p>
-    Licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-    Design inspired by the <a href="https://anttwo.github.io/surflo/">Surflo</a> project page.
-  </p>
-</footer>
 
 </body>
 </html>
