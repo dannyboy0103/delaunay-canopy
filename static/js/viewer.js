@@ -353,7 +353,10 @@ function buildHero(canvas) {
     if (!visible || !ready) return;
 
     if (reduceMotion) {
-      // A single still composition, both states layered.
+      // Rotation stays, since it is the hero's core visual. Only the pulsing
+      // point-cloud to wireframe crossfade is dropped, both states are layered.
+      t += dt;
+      spinner.rotation.y = t * HERO.spin;
       pointMat.opacity = 0.35 * HERO.pointOpacity;
       lineMat.opacity = HERO.lineOpacity;
       points.visible = lines.visible = true;
